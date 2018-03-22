@@ -2,36 +2,26 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Octokit;
-using Octokit.Internal;
 
 namespace DontMergeMeYet.Services
 {
     class PullRequestHandler : IPullRequestHandler
     {
-        private readonly IGithubAppTokenService _tokenService;
+        private readonly IGithubConnectionCache _connectionCache;
         private readonly IPullRequestPolicy _pullRequestPolicy;
 
-        public PullRequestHandler(IGithubAppTokenService tokenService, IPullRequestPolicy pullRequestPolicy)
+        public PullRequestHandler(IGithubConnectionCache connectionCache, IPullRequestPolicy pullRequestPolicy)
         {
-            _tokenService = tokenService;
+            _connectionCache = connectionCache;
             _pullRequestPolicy = pullRequestPolicy;
         }
 
         public async Task HandleWebhookEventAsync(PullRequestPayload payload)
         {
-            var connection = await GetGithubConnectionAsync(payload.Installation.Id);
+            var connection = await _connectionCache.GetConnectionAsync(payload.Installation.Id);
             var prInfo = await GetPullRequestInfoAsync(connection, payload);
             var status = _pullRequestPolicy.GetStatus(prInfo);
             await WriteCommitStatusAsync(connection, payload.Repository.Id, payload.PullRequest.Head.Sha, status);
-        }
-
-        private async Task<IConnection> GetGithubConnectionAsync(int installationId)
-        {
-            string token = await _tokenService.GetTokenForInstallationAsync(installationId);
-            var credentials = new Credentials(token);
-            var credentialStore = new InMemoryCredentialStore(credentials);
-            var connection = new Connection(new ProductHeaderValue("DontMergeMeYet"), credentialStore);
-            return connection;
         }
 
         private async Task<PullRequestInfo> GetPullRequestInfoAsync(IConnection connection, PullRequestPayload payload)

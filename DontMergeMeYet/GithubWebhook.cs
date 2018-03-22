@@ -22,9 +22,10 @@ namespace DontMergeMeYet
             "synchronize"
         };
 
-        private static readonly IPullRequestHandler PullRequestHandler = new PullRequestHandler(
-            new GithubAppTokenService(),
-            new WorkInProgressPullRequestPolicy());
+        private static readonly IPullRequestHandler PullRequestHandler =
+            new PullRequestHandler(
+                new GithubConnectionCache(new GithubAppTokenService()),
+                new WorkInProgressPullRequestPolicy());
 
         [FunctionName("GithubWebhook")]
         public static async Task<HttpResponseMessage> Run(
