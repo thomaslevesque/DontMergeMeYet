@@ -10,6 +10,20 @@ DontMergeMeYet marks the pull request as pending if one of these conditions is t
 
 Otherwise, the pull request is marked as ready to merge.
 
+## Screenshots
+
+If a pull request contains "WIP" or "DO NOT MERGE" in its title or in a commit message, DontMergeMeYet shows the following status:
+
+![Work in progress](assets/status-wip.png)
+
+If a pull request has commits that need to be squashed (`fixup!` or `squash!` commits), DontMergeMeYet shows the following status:
+
+![Squash needed](assets/status-squash-needed.png)
+
+Otherwise, DontMergeMeYet shows the following status:
+
+![Ready to merge](assets/status-ready.png)
+
 ## Installation
 
 Head to the application's [public page](https://github.com/apps/dontmergemeyet), and install the app into one or more repos.
