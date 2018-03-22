@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using DontMergeMeYet.Services;
 using Microsoft.Azure.WebJobs;
@@ -27,6 +28,9 @@ namespace DontMergeMeYet
                 new GithubConnectionCache(new GithubAppTokenService()),
                 new WorkInProgressPullRequestPolicy());
 
+        private static readonly IGithubPayloadValidator PayloadValidator =
+            new GithubPayloadValidator();
+
         [FunctionName("GithubWebhook")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "POST")]
@@ -35,13 +39,19 @@ namespace DontMergeMeYet
         {
             string eventName = request.Headers.GetValues("X-GitHub-Event").FirstOrDefault();
             string deliveryId = request.Headers.GetValues("X-GitHub-Delivery").FirstOrDefault();
+            string signature = request.Headers.GetValues("X-Hub-Signature").FirstOrDefault();
 
             log.Info($"Webhook delivery: Delivery id = '{deliveryId}', Event name = '{eventName}'");
 
             if (eventName == "pull_request")
             {
+                var payloadBytes = await request.Content.ReadAsByteArrayAsync();
+                if (!PayloadValidator.IsPayloadSignatureValid(payloadBytes, signature))
+                {
+                    return request.CreateResponse(HttpStatusCode.BadRequest, "Invalid signature");
+                }
 
-                var payload = await DeserializeBodyAsync<PullRequestPayload>(request.Content);
+                var payload = DeserializeBody<PullRequestPayload>(payloadBytes);
                 if (PullRequestActions.Contains(payload.Action))
                 {
                     log.Info($"Handling pull request action '{payload.Action}'");
@@ -60,9 +70,9 @@ namespace DontMergeMeYet
             return request.CreateResponse(HttpStatusCode.NoContent);
         }
 
-        private static async Task<T> DeserializeBodyAsync<T>(HttpContent body)
+        private static T DeserializeBody<T>(byte[] bytes)
         {
-            string json = await body.ReadAsStringAsync();
+            string json = Encoding.UTF8.GetString(bytes);
             var serializer = new SimpleJsonSerializer();
             return serializer.Deserialize<T>(json);
         }

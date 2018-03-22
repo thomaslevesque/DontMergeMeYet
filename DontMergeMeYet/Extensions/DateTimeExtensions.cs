@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DontMergeMeYet.Models.Github.Webhooks
+namespace DontMergeMeYet.Extensions
 {
     static class DateTimeExtensions
     {

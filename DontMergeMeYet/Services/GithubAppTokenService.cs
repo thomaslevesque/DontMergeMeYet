@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using DontMergeMeYet.Models.Github.Webhooks;
+using DontMergeMeYet.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 
@@ -13,7 +12,7 @@ namespace DontMergeMeYet.Services
 {
     class GithubAppTokenService : IGithubAppTokenService
     {
-        private readonly GithubSettings _settings = GetGithubSettings();
+        private readonly GithubSettings _settings = GithubSettings.Default;
 
         public Task<string> GetTokenForApplicationAsync()
         {
@@ -61,17 +60,6 @@ namespace DontMergeMeYet.Services
                     return obj["token"]?.Value<string>();
                 }
             }
-        }
-
-
-        private static GithubSettings GetGithubSettings()
-        {
-            return new GithubSettings
-            {
-                AppId = ConfigurationManager.AppSettings["GithubAppId"],
-                WebhookSecret = ConfigurationManager.AppSettings["GithubWebhookSecret"],
-                PrivateKey = ConfigurationManager.AppSettings["GithubPrivateKey"]
-            };
         }
     }
 }

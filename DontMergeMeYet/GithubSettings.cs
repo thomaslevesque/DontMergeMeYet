@@ -1,25 +1,32 @@
-﻿using System.Security.Cryptography;
+﻿using System.Configuration;
+using System.Security.Cryptography;
 using DontMergeMeYet.Services;
 
 namespace DontMergeMeYet
 {
     public class GithubSettings
     {
-        public string AppId { get; set; }
-        public string WebhookSecret { get; set; }
-        public string PrivateKey { get; set; }
-
-        private RSAParameters? _rsaParameters;
-        public RSAParameters RsaParameters
+        public GithubSettings(string appId, string webhookSecret, string privateKey)
         {
-            get
-            {
-                if (_rsaParameters == null && !string.IsNullOrEmpty(PrivateKey))
-                {
-                    _rsaParameters = CryptoHelper.GetRsaParameters(PrivateKey);
-                }
-                return _rsaParameters ?? default;
-            }
+            AppId = appId;
+            WebhookSecret = webhookSecret;
+            PrivateKey = privateKey;
+            RsaParameters = CryptoHelper.GetRsaParameters(privateKey);
+        }
+
+        public string AppId { get; }
+        public string WebhookSecret { get; }
+        public string PrivateKey { get; }
+        public RSAParameters RsaParameters { get; }
+
+        public static GithubSettings Default { get; } = LoadSettings();
+
+        private static GithubSettings LoadSettings()
+        {
+            return new GithubSettings(
+                ConfigurationManager.AppSettings["GithubAppId"],
+                ConfigurationManager.AppSettings["GithubWebhookSecret"],
+                ConfigurationManager.AppSettings["GithubPrivateKey"]);
         }
     }
 }
