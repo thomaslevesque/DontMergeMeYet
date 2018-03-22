@@ -13,3 +13,11 @@ Otherwise, the pull request is marked as ready to merge.
 ## Installation
 
 Head to the application's [public page](https://github.com/apps/dontmergemeyet), and install the app into one or more repos.
+
+## Privacy
+
+DontMergeMeYet doesn't store any information on users or repositories. By using DontMergeMeYet, you grant it the following permissions:
+
+❌ No access to code  
+✔️ Read access to metadata and pull requests  
+✔️ Read and write access to commit statuses
