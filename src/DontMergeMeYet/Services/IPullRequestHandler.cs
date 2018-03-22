@@ -4,6 +4,6 @@ namespace DontMergeMeYet.Services
 {
     internal interface IPullRequestHandler
     {
-        Task HandleWebhookEventAsync(PullRequestPayload payload);
+        Task HandleWebhookEventAsync(PullRequestEventContext context);
     }
 }

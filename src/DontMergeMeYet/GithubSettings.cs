@@ -6,11 +6,12 @@ namespace DontMergeMeYet
 {
     public class GithubSettings
     {
-        public GithubSettings(string appId, string webhookSecret, string privateKey)
+        public GithubSettings(string appId, string webhookSecret, string privateKey, string statusContext)
         {
             AppId = appId;
             WebhookSecret = webhookSecret;
             PrivateKey = privateKey;
+            StatusContext = statusContext;
             RsaParameters = CryptoHelper.GetRsaParameters(privateKey);
         }
 
@@ -18,6 +19,7 @@ namespace DontMergeMeYet
         public string WebhookSecret { get; }
         public string PrivateKey { get; }
         public RSAParameters RsaParameters { get; }
+        public string StatusContext { get; set; }
 
         public static GithubSettings Default { get; } = LoadSettings();
 
@@ -26,7 +28,8 @@ namespace DontMergeMeYet
             return new GithubSettings(
                 ConfigurationManager.AppSettings["GithubAppId"],
                 ConfigurationManager.AppSettings["GithubWebhookSecret"],
-                ConfigurationManager.AppSettings["GithubPrivateKey"]);
+                ConfigurationManager.AppSettings["GithubPrivateKey"],
+                ConfigurationManager.AppSettings["GithubStatusContext"]);
         }
     }
 }

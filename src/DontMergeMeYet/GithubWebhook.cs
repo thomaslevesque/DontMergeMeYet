@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using DontMergeMeYet.Extensions;
 using DontMergeMeYet.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -23,10 +24,14 @@ namespace DontMergeMeYet
             "synchronize"
         };
 
+        private static readonly IGithubConnectionCache GithubConnectionCache =
+            new GithubConnectionCache(new GithubAppTokenService());
+
         private static readonly IPullRequestHandler PullRequestHandler =
             new PullRequestHandler(
-                new GithubConnectionCache(new GithubAppTokenService()),
-                new WorkInProgressPullRequestPolicy());
+                new PullRequestInfoProvider(),
+                new WorkInProgressPullRequestPolicy(),
+                new CommitStatusWriter());
 
         private static readonly IGithubPayloadValidator PayloadValidator =
             new GithubPayloadValidator();
@@ -37,9 +42,9 @@ namespace DontMergeMeYet
             HttpRequestMessage request,
             TraceWriter log)
         {
-            string eventName = request.Headers.GetValues("X-GitHub-Event").FirstOrDefault();
-            string deliveryId = request.Headers.GetValues("X-GitHub-Delivery").FirstOrDefault();
-            string signature = request.Headers.GetValues("X-Hub-Signature").FirstOrDefault();
+            string eventName = request.Headers.GetValueOrDefault("X-GitHub-Event");
+            string deliveryId = request.Headers.GetValueOrDefault("X-GitHub-Delivery");
+            string signature = request.Headers.GetValueOrDefault("X-Hub-Signature");
 
             log.Info($"Webhook delivery: Delivery id = '{deliveryId}', Event name = '{eventName}'");
 
@@ -55,7 +60,9 @@ namespace DontMergeMeYet
                 if (PullRequestActions.Contains(payload.Action))
                 {
                     log.Info($"Handling pull request action '{payload.Action}'");
-                    await PullRequestHandler.HandleWebhookEventAsync(payload);
+                    var connection = await GithubConnectionCache.GetConnectionAsync(payload.Installation.Id);
+                    var context = new PullRequestEventContext(payload, connection);
+                    await PullRequestHandler.HandleWebhookEventAsync(context);
                 }
                 else
                 {

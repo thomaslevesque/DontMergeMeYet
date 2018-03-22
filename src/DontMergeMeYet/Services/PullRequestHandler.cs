@@ -1,51 +1,25 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Octokit;
+﻿using System.Threading.Tasks;
 
 namespace DontMergeMeYet.Services
 {
     class PullRequestHandler : IPullRequestHandler
     {
-        private readonly IGithubConnectionCache _connectionCache;
+        private readonly IPullRequestInfoProvider _prInfoProvider;
         private readonly IPullRequestPolicy _pullRequestPolicy;
+        private readonly ICommitStatusWriter _statusWriter;
 
-        public PullRequestHandler(IGithubConnectionCache connectionCache, IPullRequestPolicy pullRequestPolicy)
+        public PullRequestHandler(IPullRequestInfoProvider prInfoProvider, IPullRequestPolicy pullRequestPolicy, ICommitStatusWriter statusWriter)
         {
-            _connectionCache = connectionCache;
+            _prInfoProvider = prInfoProvider;
             _pullRequestPolicy = pullRequestPolicy;
+            _statusWriter = statusWriter;
         }
 
-        public async Task HandleWebhookEventAsync(PullRequestPayload payload)
+        public async Task HandleWebhookEventAsync(PullRequestEventContext context)
         {
-            var connection = await _connectionCache.GetConnectionAsync(payload.Installation.Id);
-            var prInfo = await GetPullRequestInfoAsync(connection, payload);
-            var status = _pullRequestPolicy.GetStatus(prInfo);
-            await WriteCommitStatusAsync(connection, payload.Repository.Id, payload.PullRequest.Head.Sha, status);
-        }
-
-        private async Task<PullRequestInfo> GetPullRequestInfoAsync(IConnection connection, PullRequestPayload payload)
-        {
-            var commits = await GetCommitsAsync(connection, payload.Repository.Id, payload.Number);
-            return new PullRequestInfo
-            {
-                Title = payload.PullRequest.Title,
-                SourceRepositoryFullName = payload.Repository.FullName,
-                Head = payload.PullRequest.Head.Sha,
-                CommitMessages = commits.Select(c => c.Commit.Message)
-            };
-        }
-
-        private Task<IReadOnlyList<PullRequestCommit>> GetCommitsAsync(IConnection connection, long repositoryId, int pullRequestNumber)
-        {
-            var client = new GitHubClient(connection);
-            return client.PullRequest.Commits(repositoryId, pullRequestNumber);
-        }
-
-        private async Task WriteCommitStatusAsync(IConnection connection, long repositoryId, string sha1, NewCommitStatus status)
-        {
-            var client = new CommitStatusClient(new ApiConnection(connection));
-            await client.Create(repositoryId, sha1, status);
+            var prInfo = await _prInfoProvider.GetPullRequestInfoAsync(context);
+            var (state, description) = _pullRequestPolicy.GetStatus(prInfo);
+            await _statusWriter.WriteCommitStatusAsync(context, state, description);
         }
     }
 }
