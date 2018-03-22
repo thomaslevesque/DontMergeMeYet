@@ -2,9 +2,9 @@
 using System.IO;
 using System.Security.Cryptography;
 
-namespace DontMergeMeYet
+namespace DontMergeMeYet.Services
 {
-    public class CryptoHelper
+    static class CryptoHelper
     {
         public static RSAParameters GetRsaParameters(string privateKeyBase64)
         {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace DontMergeMeYet.Models.Github
+namespace DontMergeMeYet
 {
     public class Installation
     {

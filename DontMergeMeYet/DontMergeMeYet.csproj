@@ -1,36 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
+    <AzureFunctionsVersion>v1</AzureFunctionsVersion>
+    <RootNamespace>DontMergeMeYet</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Remove="Migrations\20180318212950_InitialSchema.cs" />
-    <Compile Remove="Migrations\20180318212950_InitialSchema.Designer.cs" />
-    <Compile Remove="Migrations\20180318214633_InitialSchema.cs" />
-    <Compile Remove="Migrations\20180318214633_InitialSchema.Designer.cs" />
-    <Compile Remove="Migrations\20180318225934_InitialSchema.cs" />
-    <Compile Remove="Migrations\20180318225934_InitialSchema.Designer.cs" />
-    <Compile Remove="Migrations\20180318231617_InitialSchema.cs" />
-    <Compile Remove="Migrations\20180318231617_InitialSchema.Designer.cs" />
-    <Compile Remove="Migrations\20180318233645_InitialSchema.cs" />
-    <Compile Remove="Migrations\20180318233645_InitialSchema.Designer.cs" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Octokit" Version="0.29.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.1" />
   </ItemGroup>
-
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Configuration.Install">
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7\System.Configuration.Install.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection">
+      <HintPath>C:\Users\Tom\.nuget\packages\microsoft.extensions.dependencyinjection\2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.dll</HintPath>
     </Reference>
+    <Reference Include="System.Configuration" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 </Project>

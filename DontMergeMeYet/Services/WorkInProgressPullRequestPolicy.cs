@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using DontMergeMeYet.Models;
-using DontMergeMeYet.Models.Github;
+using Octokit;
 
 namespace DontMergeMeYet.Services
 {
-    class PullRequestChecker : IPullRequestChecker
+    class WorkInProgressPullRequestPolicy : IPullRequestPolicy
     {
         public bool IsReadyToMerge(PullRequestInfo pullRequest)
         {
@@ -15,32 +14,33 @@ namespace DontMergeMeYet.Services
 
         private const string CommitStatusContext = "DontMergeMeYet";
 
-        public CommitStatus GetStatus(PullRequestInfo pullRequest)
+        public NewCommitStatus GetStatus(PullRequestInfo pullRequest)
         {
-            if (ContainsWip(pullRequest.Title) || pullRequest.CommitMessages.Any(ContainsWip))
+           if (ContainsWip(pullRequest.Title) || pullRequest.CommitMessages.Any(ContainsWip))
             {
-                return new CommitStatus
+           
+                return new NewCommitStatus
                 {
                     Context = CommitStatusContext,
-                    State = CommitStatusState.Pending,
+                    State = CommitState.Pending,
                     Description = "Work in progress"
                 };
             }
 
             if (pullRequest.CommitMessages.Any(ShouldBeSquashed))
             {
-                return new CommitStatus
+                return new NewCommitStatus
                 {
                     Context = CommitStatusContext,
-                    State = CommitStatusState.Pending,
+                    State = CommitState.Pending,
                     Description = "Needs to be squashed before merging"
                 };
             }
 
-            return new CommitStatus
+            return new NewCommitStatus
             {
                 Context = CommitStatusContext,
-                State = CommitStatusState.Success,
+                State = CommitState.Success,
                 Description = "Ready to merge"
             };
         }

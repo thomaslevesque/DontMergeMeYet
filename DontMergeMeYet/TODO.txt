@@ -1,4 +1,0 @@
-﻿TODO
-
-- check payload signature
-- check PR labels
