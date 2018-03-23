@@ -12,18 +12,25 @@ namespace DontMergeMeYet.Services
 {
     class GithubAppTokenService : IGithubAppTokenService
     {
-        private readonly GithubSettings _settings = GithubSettings.Default;
+        private readonly IGithubSettingsProvider _settingsProvider;
+
+        public GithubAppTokenService(IGithubSettingsProvider settingsProvider)
+        {
+            _settingsProvider = settingsProvider;
+        }
 
         public Task<string> GetTokenForApplicationAsync()
         {
-            var key = new RsaSecurityKey(_settings.RsaParameters);
+            var settings = _settingsProvider.Settings;
+
+            var key = new RsaSecurityKey(settings.RsaParameters);
             var creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
             var now = DateTime.UtcNow;
             var token = new JwtSecurityToken(claims: new[]
                 {
                     new Claim("iat", now.ToUnixTimeStamp().ToString(), ClaimValueTypes.Integer),
                     new Claim("exp", now.AddMinutes(10).ToUnixTimeStamp().ToString(), ClaimValueTypes.Integer),
-                    new Claim("iss", _settings.AppId)
+                    new Claim("iss", settings.AppId)
                 },
                 signingCredentials: creds);
 

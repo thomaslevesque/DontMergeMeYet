@@ -7,7 +7,7 @@ namespace DontMergeMeYet.Services
 {
     class PullRequestInfoProvider : IPullRequestInfoProvider
     {
-        public async Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestEventContext context)
+        public async Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestContext context)
         {
             var commits = await GetCommitsAsync(context);
             var labels = await GetLabelsAsync(context);
@@ -21,13 +21,13 @@ namespace DontMergeMeYet.Services
             };
         }
 
-        private Task<IReadOnlyList<PullRequestCommit>> GetCommitsAsync(PullRequestEventContext context)
+        private Task<IReadOnlyList<PullRequestCommit>> GetCommitsAsync(PullRequestContext context)
         {
             var client = new GitHubClient(context.GithubConnection);
             return client.PullRequest.Commits(context.Payload.Repository.Id, context.Payload.PullRequest.Number);
         }
 
-        private Task<IReadOnlyList<Label>> GetLabelsAsync(PullRequestEventContext context)
+        private Task<IReadOnlyList<Label>> GetLabelsAsync(PullRequestContext context)
         {
             var client = new IssuesLabelsClient(new ApiConnection(context.GithubConnection));
             return client.GetAllForIssue(context.Payload.Repository.Id, context.Payload.PullRequest.Number);

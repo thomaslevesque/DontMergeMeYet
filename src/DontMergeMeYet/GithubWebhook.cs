@@ -24,17 +24,20 @@ namespace DontMergeMeYet
             "synchronize"
         };
 
+        private static readonly IGithubSettingsProvider SettingsProvider =
+            new DefaultGithubSettingsProvider();
+
         private static readonly IGithubConnectionCache GithubConnectionCache =
-            new GithubConnectionCache(new GithubAppTokenService());
+            new GithubConnectionCache(new GithubAppTokenService(SettingsProvider));
 
         private static readonly IPullRequestHandler PullRequestHandler =
             new PullRequestHandler(
                 new PullRequestInfoProvider(),
                 new WorkInProgressPullRequestPolicy(),
-                new CommitStatusWriter());
+                new CommitStatusWriter(SettingsProvider));
 
         private static readonly IGithubPayloadValidator PayloadValidator =
-            new GithubPayloadValidator();
+            new GithubPayloadValidator(SettingsProvider);
 
         [FunctionName("GithubWebhook")]
         public static async Task<HttpResponseMessage> Run(
@@ -61,7 +64,7 @@ namespace DontMergeMeYet
                 {
                     log.Info($"Handling pull request action '{payload.Action}'");
                     var connection = await GithubConnectionCache.GetConnectionAsync(payload.Installation.Id);
-                    var context = new PullRequestEventContext(payload, connection);
+                    var context = new PullRequestContext(payload, connection);
                     await PullRequestHandler.HandleWebhookEventAsync(context);
                 }
                 else

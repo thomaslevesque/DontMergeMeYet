@@ -5,16 +5,21 @@ using DontMergeMeYet.Extensions;
 
 namespace DontMergeMeYet.Services
 {
-    class GithubPayloadValidator : IGithubPayloadValidator
+    public class GithubPayloadValidator : IGithubPayloadValidator
     {
-        private readonly GithubSettings _settings = GithubSettings.Default;
+        private readonly IGithubSettingsProvider _settingsProvider;
+
+        public GithubPayloadValidator(IGithubSettingsProvider settingsProvider)
+        {
+            _settingsProvider = settingsProvider;
+        }
 
         public bool IsPayloadSignatureValid(byte[] bytes, string receivedSignature)
         {
             if (string.IsNullOrEmpty(receivedSignature))
                 return false;
 
-            var key = Encoding.ASCII.GetBytes(_settings.WebhookSecret);
+            var key = Encoding.ASCII.GetBytes(_settingsProvider.Settings.WebhookSecret);
             var hmac = new HMACSHA1(key);
             var hash = hmac.ComputeHash(bytes);
             var actualSignature = "sha1=" + hash.ToHexString();

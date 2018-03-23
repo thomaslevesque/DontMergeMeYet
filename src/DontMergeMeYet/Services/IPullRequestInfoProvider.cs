@@ -4,6 +4,6 @@ namespace DontMergeMeYet.Services
 {
     public interface IPullRequestInfoProvider
     {
-        Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestEventContext context);
+        Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestContext context);
     }
 }

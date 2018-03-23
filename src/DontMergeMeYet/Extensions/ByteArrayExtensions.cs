@@ -14,8 +14,7 @@ namespace DontMergeMeYet.Extensions
             char[] digits = new char[bytes.Length * 2];
             for (int i = 0; i < bytes.Length; i++)
             {
-                int d1, d2;
-                d1 = Math.DivRem(bytes[i], 16, out d2);
+                var d1 = Math.DivRem(bytes[i], 16, out var d2);
                 digits[2 * i] = HexDigits[d1];
                 digits[2 * i + 1] = HexDigits[d2];
             }

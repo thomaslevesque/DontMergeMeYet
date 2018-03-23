@@ -2,7 +2,7 @@
 
 namespace DontMergeMeYet.Services
 {
-    class PullRequestHandler : IPullRequestHandler
+    public class PullRequestHandler : IPullRequestHandler
     {
         private readonly IPullRequestInfoProvider _prInfoProvider;
         private readonly IPullRequestPolicy _pullRequestPolicy;
@@ -15,7 +15,7 @@ namespace DontMergeMeYet.Services
             _statusWriter = statusWriter;
         }
 
-        public async Task HandleWebhookEventAsync(PullRequestEventContext context)
+        public async Task HandleWebhookEventAsync(PullRequestContext context)
         {
             var prInfo = await _prInfoProvider.GetPullRequestInfoAsync(context);
             var (state, description) = _pullRequestPolicy.GetStatus(prInfo);

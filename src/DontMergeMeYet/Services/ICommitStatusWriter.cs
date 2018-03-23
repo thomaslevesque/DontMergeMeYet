@@ -5,6 +5,6 @@ namespace DontMergeMeYet.Services
 {
     public interface ICommitStatusWriter
     {
-        Task WriteCommitStatusAsync(PullRequestEventContext context, CommitState state, string description);
+        Task WriteCommitStatusAsync(PullRequestContext context, CommitState state, string description);
     }
 }

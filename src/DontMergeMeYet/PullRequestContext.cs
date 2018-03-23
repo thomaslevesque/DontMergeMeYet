@@ -2,12 +2,12 @@
 
 namespace DontMergeMeYet
 {
-    public class PullRequestEventContext
+    public class PullRequestContext
     {
         public PullRequestPayload Payload { get; }
         public IConnection GithubConnection { get; }
 
-        public PullRequestEventContext(PullRequestPayload payload, IConnection githubConnection)
+        public PullRequestContext(PullRequestPayload payload, IConnection githubConnection)
         {
             Payload = payload;
             GithubConnection = githubConnection;
