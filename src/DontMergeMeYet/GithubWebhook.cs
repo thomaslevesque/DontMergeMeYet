@@ -1,12 +1,10 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using DontMergeMeYet.Extensions;
 using DontMergeMeYet.Services;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Octokit.Internal;
 
@@ -36,30 +34,20 @@ namespace DontMergeMeYet
                 new WorkInProgressPullRequestPolicy(),
                 new CommitStatusWriter(SettingsProvider));
 
-        private static readonly IGithubPayloadValidator PayloadValidator =
-            new GithubPayloadValidator(SettingsProvider);
-
         [FunctionName("GithubWebhook")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "POST")]
+            [HttpTrigger("POST", WebHookType = "github")]
             HttpRequestMessage request,
             TraceWriter log)
         {
             string eventName = request.Headers.GetValueOrDefault("X-GitHub-Event");
             string deliveryId = request.Headers.GetValueOrDefault("X-GitHub-Delivery");
-            string signature = request.Headers.GetValueOrDefault("X-Hub-Signature");
 
             log.Info($"Webhook delivery: Delivery id = '{deliveryId}', Event name = '{eventName}'");
 
             if (eventName == "pull_request")
             {
-                var payloadBytes = await request.Content.ReadAsByteArrayAsync();
-                if (!PayloadValidator.IsPayloadSignatureValid(payloadBytes, signature))
-                {
-                    return request.CreateResponse(HttpStatusCode.BadRequest, "Invalid signature");
-                }
-
-                var payload = DeserializeBody<PullRequestPayload>(payloadBytes);
+                var payload = await DeserializeBody<PullRequestPayload>(request.Content);
                 if (PullRequestActions.Contains(payload.Action))
                 {
                     log.Info($"Handling pull request action '{payload.Action}'");
@@ -80,9 +68,9 @@ namespace DontMergeMeYet
             return request.CreateResponse(HttpStatusCode.NoContent);
         }
 
-        private static T DeserializeBody<T>(byte[] bytes)
+        private static async Task<T> DeserializeBody<T>(HttpContent content)
         {
-            string json = Encoding.UTF8.GetString(bytes);
+            string json = await content.ReadAsStringAsync();
             var serializer = new SimpleJsonSerializer();
             return serializer.Deserialize<T>(json);
         }
