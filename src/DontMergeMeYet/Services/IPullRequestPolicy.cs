@@ -4,6 +4,6 @@ namespace DontMergeMeYet.Services
 {
     public interface IPullRequestPolicy
     {
-        (CommitState state, string description) GetStatus(PullRequestInfo pullRequest);
+        (CommitState state, string description) GetStatus(PullRequestContext context, PullRequestInfo pullRequest);
     }
 }

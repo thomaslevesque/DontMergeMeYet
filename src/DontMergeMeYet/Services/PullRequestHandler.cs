@@ -17,8 +17,12 @@ namespace DontMergeMeYet.Services
 
         public async Task HandleWebhookEventAsync(PullRequestContext context)
         {
+            context.Log.Verbose($"Getting details for pull request #{context.Payload.Number}...");
             var prInfo = await _prInfoProvider.GetPullRequestInfoAsync(context);
-            var (state, description) = _pullRequestPolicy.GetStatus(prInfo);
+            context.Log.Verbose($"Evaluating status for pull request #{context.Payload.Number}...");
+            var (state, description) = _pullRequestPolicy.GetStatus(context, prInfo);
+            context.Log.Info($"Status for pull request #{context.Payload.Number} is '{state}' ({description})");
+            context.Log.Verbose($"Writing commit status for pull request #{context.Payload.Number}...");
             await _statusWriter.WriteCommitStatusAsync(context, state, description);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Octokit;
+﻿using Microsoft.Azure.WebJobs.Host;
+using Octokit;
 
 namespace DontMergeMeYet
 {
@@ -6,11 +7,13 @@ namespace DontMergeMeYet
     {
         public PullRequestPayload Payload { get; }
         public IConnection GithubConnection { get; }
+        public TraceWriter Log { get; }
 
-        public PullRequestContext(PullRequestPayload payload, IConnection githubConnection)
+        public PullRequestContext(PullRequestPayload payload, IConnection githubConnection, TraceWriter log)
         {
             Payload = payload;
             GithubConnection = githubConnection;
+            Log = log;
         }
     }
 }

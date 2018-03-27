@@ -27,7 +27,7 @@ namespace DontMergeMeYet.Tests
         public async Task HandleWebhookEventAsync_should_write_status_returned_by_policy()
         {
             // Arrange
-            A.CallTo(() => _pullRequestPolicy.GetStatus(A<PullRequestInfo>._))
+            A.CallTo(() => _pullRequestPolicy.GetStatus(A<PullRequestContext>._, A<PullRequestInfo>._))
                 .Returns((CommitState.Pending, "blah"));
 
             // Act

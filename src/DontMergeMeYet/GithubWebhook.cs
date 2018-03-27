@@ -50,10 +50,11 @@ namespace DontMergeMeYet
                 var payload = await DeserializeBody<PullRequestPayload>(request.Content);
                 if (PullRequestActions.Contains(payload.Action))
                 {
-                    log.Info($"Handling pull request action '{payload.Action}'");
+                    log.Info($"Handling action '{payload.Action}' for pull request #{payload.Number}");
                     var connection = await GithubConnectionCache.GetConnectionAsync(payload.Installation.Id);
-                    var context = new PullRequestContext(payload, connection);
+                    var context = new PullRequestContext(payload, connection, log);
                     await PullRequestHandler.HandleWebhookEventAsync(context);
+                    log.Info($"Finished handling action '{payload.Action}' for pull request #{payload.Number}");
                 }
                 else
                 {
