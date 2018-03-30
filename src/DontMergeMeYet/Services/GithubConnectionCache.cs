@@ -25,9 +25,11 @@ namespace DontMergeMeYet.Services
             return _memoryCache.GetOrCreateAsync(installationId, async cacheEntry =>
             {
                 var token = await _tokenService.GetTokenForInstallationAsync(installationId);
-                var credentials = new Credentials(token);
-                var credentialStore = new InMemoryCredentialStore(credentials);
-                IConnection connection = new Connection(new ProductHeaderValue("DontMergeMeYet"), credentialStore);
+                var userAgent = new ProductHeaderValue("DontMergeMeYet");
+                IConnection connection = new Connection(userAgent)
+                {
+                    Credentials = new Credentials(token)
+                };
                 cacheEntry.SetValue(connection);
                 cacheEntry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
                 return connection;
