@@ -1,7 +1,9 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web.Http;
 using DontMergeMeYet.Extensions;
 using DontMergeMeYet.Services;
 using Microsoft.Azure.WebJobs;
@@ -31,13 +33,13 @@ namespace DontMergeMeYet
         private static readonly IPullRequestHandler PullRequestHandler =
             new PullRequestHandler(
                 new PullRequestInfoProvider(),
+                new RepositorySettingsProvider(),
                 new WorkInProgressPullRequestPolicy(),
                 new CommitStatusWriter(SettingsProvider));
 
         [FunctionName("GithubWebhook")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger("POST", WebHookType = "github")]
-            HttpRequestMessage request,
+            [HttpTrigger("POST", WebHookType = "github")] HttpRequestMessage request,
             TraceWriter log)
         {
             string eventName = request.Headers.GetValueOrDefault("X-GitHub-Event");
@@ -50,11 +52,19 @@ namespace DontMergeMeYet
                 var payload = await DeserializeBody<PullRequestPayload>(request.Content);
                 if (PullRequestActions.Contains(payload.Action))
                 {
-                    log.Info($"Handling action '{payload.Action}' for pull request #{payload.Number}");
-                    var connection = await GithubConnectionCache.GetConnectionAsync(payload.Installation.Id);
-                    var context = new PullRequestContext(payload, connection, log);
-                    await PullRequestHandler.HandleWebhookEventAsync(context);
-                    log.Info($"Finished handling action '{payload.Action}' for pull request #{payload.Number}");
+                    try
+                    {
+                        log.Info($"Handling action '{payload.Action}' for pull request #{payload.Number}");
+                        var connection = await GithubConnectionCache.GetConnectionAsync(payload.Installation.Id);
+                        var context = new PullRequestContext(payload, connection, log);
+                        await PullRequestHandler.HandleWebhookEventAsync(context);
+                        log.Info($"Finished handling action '{payload.Action}' for pull request #{payload.Number}");
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error($"Error processing pull request webhook event {deliveryId}", ex);
+                        return request.CreateErrorResponse(HttpStatusCode.InternalServerError, new HttpError(ex.Message));
+                    }
                 }
                 else
                 {

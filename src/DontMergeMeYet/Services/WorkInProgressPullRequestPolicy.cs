@@ -7,25 +7,27 @@ namespace DontMergeMeYet.Services
 {
     class WorkInProgressPullRequestPolicy : IPullRequestPolicy
     {
-        public (CommitState state, string description) GetStatus(
-            PullRequestContext context,
-            PullRequestInfo pullRequest)
+        public (CommitState state, string description) GetStatus(PullRequestContext context)
         {
-            if (ContainsWip(pullRequest.Title))
+            var pullRequest = context.PullRequestInfo;
+            var containsWip = ContainsWip(context.RepositorySettings);
+
+            if (containsWip(pullRequest.Title))
             {
                 context.Log.Info("Pull request title matches WIP regex");
                 return (CommitState.Pending, "Work in progress");
             }
 
-            if (pullRequest.CommitMessages.Any(ContainsWip))
+            if (pullRequest.CommitMessages.Any(containsWip))
             {
                 context.Log.Info("Commit message matches WIP regex");
                 return (CommitState.Pending, "Work in progress");
             }
 
-            if (pullRequest.Labels.Any(ContainsWip))
+            var wipLabels = context.RepositorySettings.WipLabels ?? Array.Empty<string>();
+            if (pullRequest.Labels.Intersect(wipLabels, StringComparer.OrdinalIgnoreCase).Any())
             {
-                context.Log.Info("Label matches WIP regex");
+                context.Log.Info("Pull request has a WIP label");
                 return (CommitState.Pending, "Work in progress");
             }
 
@@ -38,15 +40,19 @@ namespace DontMergeMeYet.Services
             return (CommitState.Success, "Ready to merge");
         }
 
-        private static readonly Regex[] WipRegexes =
+        private Func<string, bool> ContainsWip(RepositorySettings settings)
         {
-            new Regex(@"\bwip\b", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase),
-            new Regex("\bdo not merge\b", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)
-        };
+            var patterns = settings.WipKeywords ?? Array.Empty<Keyword>();
+            return text => patterns.Any(p => IsMatch(p, text));
+        }
 
-        private bool ContainsWip(string text)
+        private bool IsMatch(Keyword keyword, string text)
         {
-            return WipRegexes.Any(r => r.IsMatch(text));
+            var regex = new Regex($@"\b{keyword.Text}\b",
+                keyword.CaseSensitive
+                    ? RegexOptions.None
+                    : RegexOptions.IgnoreCase);
+            return regex.IsMatch(text);
         }
 
         private static readonly string[] SquashPrefixes =
