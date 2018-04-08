@@ -4,9 +4,9 @@ A GitHub app that adds an "in progress" status to your pull requests to avoid me
 
 DontMergeMeYet marks the pull request as pending if one of these conditions is true:
 
-- the PR title contains "WIP" or "DO NOT MERGE"
-- the PR has a `wip` or `in-progress` label
-- a commit message contains "contains "WIP" or "DO NOT MERGE"
+- the PR title contains "WIP" or "DO NOT MERGE" (customizable)
+- the PR has a `wip` or `in-progress` label (customizable)
+- a commit message contains "contains "WIP" or "DO NOT MERGE" (customizable)
 - a commit message starts with "fixup!" or "squash!", indicating the branch should be [autosquashed](http://fle.github.io/git-tip-keep-your-branch-clean-with-fixup-and-autosquash.html)
 
 Otherwise, the pull request is marked as ready to merge.
