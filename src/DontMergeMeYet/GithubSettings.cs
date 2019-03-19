@@ -1,24 +1,10 @@
-﻿using System.Security.Cryptography;
-using DontMergeMeYet.Services;
-
-namespace DontMergeMeYet
+﻿namespace DontMergeMeYet
 {
     public class GithubSettings
     {
-        public GithubSettings(string appId, string privateKey, string statusContext)
-        {
-            AppId = appId;
-            PrivateKey = privateKey;
-            StatusContext = statusContext;
-            RsaParameters =
-                string.IsNullOrEmpty(privateKey)
-                ? default
-                : CryptoHelper.GetRsaParameters(privateKey);
-        }
-
-        public string AppId { get; }
-        public string PrivateKey { get; }
-        public RSAParameters RsaParameters { get; }
+        public string AppId { get; set; }
+        public string WebhookSecret { get; set; }
+        public string PrivateKey { get; set; }
         public string StatusContext { get; set; }
     }
 }

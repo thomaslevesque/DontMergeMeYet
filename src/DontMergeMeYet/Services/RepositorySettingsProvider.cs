@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Octokit;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -24,9 +25,9 @@ namespace DontMergeMeYet.Services
             }
         };
 
-        private static readonly Deserializer YamlDeserializer = CreateYamlDeserializer();
+        private static readonly IDeserializer YamlDeserializer = CreateYamlDeserializer();
 
-        private static Deserializer CreateYamlDeserializer()
+        private static IDeserializer CreateYamlDeserializer()
         {
             var builder = new DeserializerBuilder()
                 .WithNamingConvention(new CamelCaseNamingConvention());
@@ -49,12 +50,12 @@ namespace DontMergeMeYet.Services
             }
             catch (NotFoundException)
             {
-                context.Log.Info("Configuration file not found, using defaults");
+                context.Logger.LogInformation("Configuration file not found, using defaults");
                 return DefaultSettings;
             }
             catch(Exception ex)
             {
-                context.Log.Error("Failed to get configuration file from repo, using defaults", ex);
+                context.Logger.LogError(ex, "Failed to get configuration file from repo, using defaults");
                 return DefaultSettings;
             }
         }

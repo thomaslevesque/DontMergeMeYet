@@ -20,7 +20,7 @@ namespace DontMergeMeYet.Services
             _memoryCache = new MemoryCache(optionsAccessor);
         }
 
-        public Task<IConnection> GetConnectionAsync(int installationId)
+        public Task<IConnection> GetConnectionAsync(long installationId)
         {
             return _memoryCache.GetOrCreateAsync(installationId, async cacheEntry =>
             {

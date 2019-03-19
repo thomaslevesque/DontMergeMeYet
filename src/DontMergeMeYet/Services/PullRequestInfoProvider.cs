@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Octokit;
 
 namespace DontMergeMeYet.Services
@@ -9,9 +10,9 @@ namespace DontMergeMeYet.Services
     {
         public async Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestContext context)
         {
-            context.Log.Verbose($"Getting commits for pull request #{context.Payload.Number}");
+            context.Logger.LogDebug("Getting commits for pull request #{PullRequestNumber}", context.Payload.Number);
             var commits = await GetCommitsAsync(context);
-            context.Log.Verbose($"Getting labels for pull request #{context.Payload.Number}");
+            context.Logger.LogDebug("Getting labels for pull request #{PullRequestNumber}", context.Payload.Number);
             var labels = await GetLabelsAsync(context);
             return new PullRequestInfo
             {

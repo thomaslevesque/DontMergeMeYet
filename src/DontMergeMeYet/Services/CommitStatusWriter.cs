@@ -1,15 +1,16 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Octokit;
 
 namespace DontMergeMeYet.Services
 {
     class CommitStatusWriter : ICommitStatusWriter
     {
-        private readonly IGithubSettingsProvider _settingsProvider;
+        private readonly GithubSettings _settings;
 
-        public CommitStatusWriter(IGithubSettingsProvider settingsProvider)
+        public CommitStatusWriter(IOptions<GithubSettings> options)
         {
-            _settingsProvider = settingsProvider;
+            _settings = options.Value;
         }
 
         public async Task WriteCommitStatusAsync(PullRequestContext context, CommitState state, string description)
@@ -19,7 +20,7 @@ namespace DontMergeMeYet.Services
             {
                 State = state,
                 Description = description,
-                Context = _settingsProvider.Settings.StatusContext
+                Context = _settings.StatusContext
             };
             await client.Create(context.Payload.Repository.Id, context.Payload.PullRequest.Head.Sha, status);
         }

@@ -5,6 +5,6 @@ namespace DontMergeMeYet.Services
 {
     public interface IGithubConnectionCache
     {
-        Task<IConnection> GetConnectionAsync(int installationId);
+        Task<IConnection> GetConnectionAsync(long installationId);
     }
 }

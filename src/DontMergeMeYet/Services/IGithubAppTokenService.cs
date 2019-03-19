@@ -5,6 +5,6 @@ namespace DontMergeMeYet.Services
     interface IGithubAppTokenService
     {
         Task<string> GetTokenForApplicationAsync();
-        Task<string> GetTokenForInstallationAsync(int installationId);
+        Task<string> GetTokenForInstallationAsync(long installationId);
     }
 }

@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DontMergeMeYet.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 
@@ -12,33 +13,33 @@ namespace DontMergeMeYet.Services
 {
     class GithubAppTokenService : IGithubAppTokenService
     {
-        private readonly IGithubSettingsProvider _settingsProvider;
+        private readonly GithubSettings _settings;
+        private readonly SigningCredentials _signingCredentials;
 
-        public GithubAppTokenService(IGithubSettingsProvider settingsProvider)
+        public GithubAppTokenService(IOptions<GithubSettings> options)
         {
-            _settingsProvider = settingsProvider;
+            _settings = options.Value;
+            var rsaParameters = CryptoHelper.GetRsaParameters(_settings.PrivateKey);
+            var key = new RsaSecurityKey(rsaParameters);
+            _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
         }
 
         public Task<string> GetTokenForApplicationAsync()
         {
-            var settings = _settingsProvider.Settings;
-
-            var key = new RsaSecurityKey(settings.RsaParameters);
-            var creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
             var now = DateTime.UtcNow;
             var token = new JwtSecurityToken(claims: new[]
                 {
                     new Claim("iat", now.ToUnixTimeStamp().ToString(), ClaimValueTypes.Integer),
                     new Claim("exp", now.AddMinutes(10).ToUnixTimeStamp().ToString(), ClaimValueTypes.Integer),
-                    new Claim("iss", settings.AppId)
+                    new Claim("iss", _settings.AppId)
                 },
-                signingCredentials: creds);
+                signingCredentials: _signingCredentials);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return Task.FromResult(jwt);
         }
 
-        public async Task<string> GetTokenForInstallationAsync(int installationId)
+        public async Task<string> GetTokenForInstallationAsync(long installationId)
         {
             var appToken = await GetTokenForApplicationAsync();
             using (var client = new HttpClient())
