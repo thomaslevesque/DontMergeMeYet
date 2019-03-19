@@ -30,7 +30,7 @@ namespace DontMergeMeYet
 
         [FunctionName("GithubWebhook")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "POST")] HttpRequestMessage request,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "POST")] HttpRequestMessage request,
             ILogger logger,
             ExecutionContext executionContext)
         {
