@@ -30,7 +30,7 @@ namespace DontMergeMeYet.Services
         private static IDeserializer CreateYamlDeserializer()
         {
             var builder = new DeserializerBuilder()
-                .WithNamingConvention(new CamelCaseNamingConvention());
+                .WithNamingConvention(CamelCaseNamingConvention.Instance);
             return builder.Build();
         }
 

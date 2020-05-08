@@ -10,14 +10,12 @@ namespace DontMergeMeYet.Services
     class GithubConnectionCache : IGithubConnectionCache
     {
         private readonly IGithubAppTokenService _tokenService;
-        private readonly MemoryCache _memoryCache;
+        private readonly IMemoryCache _memoryCache;
 
-        public GithubConnectionCache(IGithubAppTokenService tokenService)
+        public GithubConnectionCache(IGithubAppTokenService tokenService, IMemoryCache memoryCache)
         {
             _tokenService = tokenService;
-            var options = new MemoryCacheOptions();
-            var optionsAccessor = Options.Create(options);
-            _memoryCache = new MemoryCache(optionsAccessor);
+            _memoryCache = memoryCache;
         }
 
         public Task<IConnection> GetConnectionAsync(long installationId)

@@ -2,7 +2,7 @@
 
 namespace DontMergeMeYet.Services
 {
-    internal interface IPullRequestHandler
+    public interface IPullRequestHandler
     {
         Task HandleWebhookEventAsync(PullRequestContext context);
     }
