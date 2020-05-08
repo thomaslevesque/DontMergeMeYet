@@ -11,16 +11,16 @@ namespace DontMergeMeYet.Services
     {
         public async Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestContext context)
         {
-            context.Logger.LogDebug("Getting commits for pull request {RepoName}#{PullRequestNumber}", context.Payload.Repository.FullName, context.Payload.Number);
+            context.Logger.LogDebug("Getting commits for pull request {RepoName}#{PullRequestNumber}", context.RepositoryName, context.Payload.Number);
             var commits = await GetCommitsAsync(context);
-            context.Logger.LogDebug("Getting labels for pull request {RepoName}#{PullRequestNumber}", context.Payload.Repository.FullName, context.Payload.Number);
+            context.Logger.LogDebug("Getting labels for pull request {RepoName}#{PullRequestNumber}", context.RepositoryName, context.Payload.Number);
             var labels = await GetLabelsAsync(context);
             return new PullRequestInfo
             {
                 Title = context.Payload.PullRequest.Title,
                 Labels = labels.Select(l => l.Name),
                 IsDraft = context.Payload.PullRequest.Draft,
-                SourceRepositoryFullName = context.Payload.Repository.FullName,
+                SourceRepositoryFullName = context.RepositoryName,
                 Head = context.Payload.PullRequest.Head.Sha,
                 CommitMessages = commits.Select(c => c.Commit.Message)
             };
