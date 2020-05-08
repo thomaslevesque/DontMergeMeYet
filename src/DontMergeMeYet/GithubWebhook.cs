@@ -68,11 +68,11 @@ namespace DontMergeMeYet
                 {
                     try
                     {
-                        logger.LogInformation("Handling action '{PayloadAction}' for pull request #{PullRequestNumber}", payload.Action, payload.Number);
+                        logger.LogInformation("Handling action '{PayloadAction}' for pull request {RepoName}#{PullRequestNumber}", payload.Action, payload.Repository.FullName, payload.Number);
                         var connection = await _githubConnectionCache.GetConnectionAsync(payload.Installation.Id);
                         var context = new PullRequestContext(payload, connection, logger);
                         await _pullRequestHandler.HandleWebhookEventAsync(context);
-                        logger.LogInformation("Finished handling action '{PayloadAction}' for pull request #{PullRequestNumber}", payload.Action, payload.Number);
+                        logger.LogInformation("Finished handling action '{PayloadAction}' for pull request {RepoName}#{PullRequestNumber}", payload.Action, payload.Repository.FullName, payload.Number);
                     }
                     catch (Exception ex)
                     {

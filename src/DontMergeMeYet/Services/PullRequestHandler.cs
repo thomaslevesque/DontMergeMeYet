@@ -23,17 +23,17 @@ namespace DontMergeMeYet.Services
 
         public async Task HandleWebhookEventAsync(PullRequestContext context)
         {
-            context.Logger.LogDebug("Getting details for pull request #{PullRequestNumber}...", context.Payload.Number);
+            context.Logger.LogDebug("Getting details for pull request {RepoName}#{PullRequestNumber}...", context.Payload.Repository.FullName, context.Payload.Number);
             context.PullRequestInfo = await _prInfoProvider.GetPullRequestInfoAsync(context);
 
-            context.Logger.LogDebug("Getting repository settings for pull request #{PullRequestNumber}", context.Payload.Number);
+            context.Logger.LogDebug("Getting repository settings for pull request {RepoName}#{PullRequestNumber}", context.Payload.Repository.FullName, context.Payload.Number);
             context.RepositorySettings = await _repositorySettingsProvider.GetRepositorySettingsAsync(context);
 
-            context.Logger.LogDebug("Evaluating status for pull request #{PullRequestNumber}...", context.Payload.Number);
+            context.Logger.LogDebug("Evaluating status for pull request {RepoName}#{PullRequestNumber}...", context.Payload.Repository.FullName, context.Payload.Number);
             var (state, description) = _pullRequestPolicy.GetStatus(context);
-            context.Logger.LogInformation("Status for pull request #{PullRequestNumber} is '{PullRequestState}' ({PullRequestDescription})", context.Payload.Number, state, description);
+            context.Logger.LogInformation("Status for pull request {RepoName}#{PullRequestNumber} is '{PullRequestState}' ({PullRequestDescription})", context.Payload.Repository.FullName, context.Payload.Number, state, description);
 
-            context.Logger.LogDebug("Writing commit status for pull request #{PullRequestNumber}...", context.Payload.Number);
+            context.Logger.LogDebug("Writing commit status for pull request {RepoName}#{PullRequestNumber}...", context.Payload.Repository.FullName, context.Payload.Number);
             await _statusWriter.WriteCommitStatusAsync(context, state, description);
         }
     }

@@ -10,9 +10,9 @@ namespace DontMergeMeYet.Services
     {
         public async Task<PullRequestInfo> GetPullRequestInfoAsync(PullRequestContext context)
         {
-            context.Logger.LogDebug("Getting commits for pull request #{PullRequestNumber}", context.Payload.Number);
+            context.Logger.LogDebug("Getting commits for pull request {RepoName}#{PullRequestNumber}", context.Payload.Repository.FullName, context.Payload.Number);
             var commits = await GetCommitsAsync(context);
-            context.Logger.LogDebug("Getting labels for pull request #{PullRequestNumber}", context.Payload.Number);
+            context.Logger.LogDebug("Getting labels for pull request {RepoName}#{PullRequestNumber}", context.Payload.Repository.FullName, context.Payload.Number);
             var labels = await GetLabelsAsync(context);
             return new PullRequestInfo
             {
