@@ -60,7 +60,7 @@ namespace DontMergeMeYet
             if (!_payloadValidator.IsPayloadSignatureValid(payloadBytes, signature))
             {
                 logger.LogWarning("Invalid signature");
-                return request.CreateResponse(HttpStatusCode.BadRequest, "Invalid signature");
+                return request.CreateErrorResponse(HttpStatusCode.BadRequest, new HttpError("Invalid signature"));
             }
 
             if (eventName == "pull_request")
