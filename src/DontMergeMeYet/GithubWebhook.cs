@@ -24,7 +24,8 @@ namespace DontMergeMeYet
             "opened",
             "edited",
             "reopened",
-            "synchronize"
+            "synchronize",
+            "ready_for_review"
         };
         private readonly IOptions<GithubSettings> _options;
         private readonly IGithubConnectionCache _githubConnectionCache;
@@ -58,6 +59,7 @@ namespace DontMergeMeYet
             var payloadBytes = await request.Content.ReadAsByteArrayAsync();
             if (!_payloadValidator.IsPayloadSignatureValid(payloadBytes, signature))
             {
+                logger.LogWarning("Invalid signature");
                 return request.CreateResponse(HttpStatusCode.BadRequest, "Invalid signature");
             }
 

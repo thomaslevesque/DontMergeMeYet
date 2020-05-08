@@ -18,6 +18,7 @@ namespace DontMergeMeYet.Services
             {
                 Title = context.Payload.PullRequest.Title,
                 Labels = labels.Select(l => l.Name),
+                IsDraft = context.Payload.PullRequest.Draft,
                 SourceRepositoryFullName = context.Payload.Repository.FullName,
                 Head = context.Payload.PullRequest.Head.Sha,
                 CommitMessages = commits.Select(c => c.Commit.Message)

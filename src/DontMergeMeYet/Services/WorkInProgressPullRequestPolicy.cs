@@ -11,6 +11,13 @@ namespace DontMergeMeYet.Services
         public (CommitState state, string description) GetStatus(PullRequestContext context)
         {
             var pullRequest = context.PullRequestInfo;
+
+            if (pullRequest.IsDraft)
+            {
+                context.Logger.LogInformation("Pull request is a draft");
+                return (CommitState.Pending, "Pull request is a draft");
+            }
+
             var containsWip = ContainsWip(context.RepositorySettings);
 
             if (containsWip(pullRequest.Title))
