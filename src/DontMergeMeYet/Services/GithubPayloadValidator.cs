@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using DontMergeMeYet.Extensions;
+using DontMergeMeYet.Services.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace DontMergeMeYet.Services

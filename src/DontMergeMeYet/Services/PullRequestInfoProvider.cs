@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DontMergeMeYet.Services.Abstractions;
 using Microsoft.Extensions.Logging;
 using Octokit;
 

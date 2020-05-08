@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DontMergeMeYet.Services.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Octokit;

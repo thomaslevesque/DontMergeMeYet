@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace DontMergeMeYet.Services
+namespace DontMergeMeYet.Services.Abstractions
 {
     public interface IPullRequestInfoProvider
     {

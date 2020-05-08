@@ -1,6 +1,6 @@
 ﻿using Octokit;
 
-namespace DontMergeMeYet.Services
+namespace DontMergeMeYet.Services.Abstractions
 {
     public interface IPullRequestPolicy
     {

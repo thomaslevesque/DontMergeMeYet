@@ -1,4 +1,4 @@
-﻿namespace DontMergeMeYet.Services
+﻿namespace DontMergeMeYet.Services.Abstractions
 {
     public interface IGithubPayloadValidator
     {

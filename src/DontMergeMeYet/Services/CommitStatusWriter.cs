@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using DontMergeMeYet.Services.Abstractions;
 using Microsoft.Extensions.Options;
 using Octokit;
 

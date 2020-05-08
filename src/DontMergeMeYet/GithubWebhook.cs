@@ -1,5 +1,5 @@
 ﻿using DontMergeMeYet.Extensions;
-using DontMergeMeYet.Services;
+using DontMergeMeYet.Services.Abstractions;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;

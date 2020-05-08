@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DontMergeMeYet.Services.Abstractions;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace DontMergeMeYet.Services

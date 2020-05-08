@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using DontMergeMeYet.Services;
+using DontMergeMeYet.Services.Abstractions;
 using FakeItEasy;
 using Octokit;
 using Xunit;

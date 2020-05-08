@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DontMergeMeYet.Services.Abstractions;
 using Microsoft.Extensions.Logging;
 using Octokit;
 
