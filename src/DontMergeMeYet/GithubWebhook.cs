@@ -44,11 +44,10 @@ namespace DontMergeMeYet
             _payloadValidator = payloadValidator;
         }
 
-        [FunctionName("GithubWebhook")]
+        [FunctionName(nameof(GithubWebhook))]
         public async Task<HttpResponseMessage> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "POST")] HttpRequestMessage request,
-            ILogger logger,
-            ExecutionContext executionContext)
+            ILogger logger)
         {
             string eventName = request.Headers.GetValueOrDefault("X-GitHub-Event");
             string deliveryId = request.Headers.GetValueOrDefault("X-GitHub-Delivery");
