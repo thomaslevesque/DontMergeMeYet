@@ -45,7 +45,7 @@ namespace DontMergeMeYet.Services
             var appToken = await GetTokenForApplicationAsync();
             using (var client = new HttpClient())
             {
-                string url = $"https://api.github.com/installations/{installationId}/access_tokens";
+                string url = $"https://api.github.com/app/installations/{installationId}/access_tokens";
                 var request = new HttpRequestMessage(HttpMethod.Post, url)
                 {
                     Headers =
